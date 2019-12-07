@@ -13,7 +13,7 @@ env:
 
   # Space separated paths to include in the archive.
   # Start relative paths with a dot if you don't want
-  # paths to be preserved. Use "\" as a delimiter.
+  # paths to be preserved. Use "/" as a delimiter.
   RELEASE_ADDS: README.md LICENSE
 
 
@@ -56,11 +56,11 @@ jobs:
       run: cargo build --verbose --release
 
     - name: Create archive for Linux
-      run: 7z a -ttar -so -an .\target\release\${{ env.RELEASE_BIN }} ${{ env.RELEASE_ADDS }} | 7z a -si ./artifacts/${{ env.RELEASE_BIN }}-linux-x86_64.tar.gz
+      run: 7z a -ttar -so -an ./target/release/${{ env.RELEASE_BIN }} ${{ env.RELEASE_ADDS }} | 7z a -si ./artifacts/${{ env.RELEASE_BIN }}-linux-x86_64.tar.gz
       if: matrix.os == 'ubuntu-latest'
 
     - name: Create archive for Windows
-      run: 7z a -tzip artifacts\${{ env.RELEASE_BIN }}-windows-x86_64.zip .\target\release\${{ env.RELEASE_BIN }}.exe ${{ env.RELEASE_ADDS }}
+      run: 7z a -tzip ./artifacts/${{ env.RELEASE_BIN }}-windows-x86_64.zip ./target/release/${{ env.RELEASE_BIN }}.exe ${{ env.RELEASE_ADDS }}
       if: matrix.os == 'windows-latest'
 
     # FIXME: Disabled for now since 7-zip is not available on MacOS.
@@ -75,3 +75,5 @@ jobs:
       with:
         name: ${{ runner.os }}
         path: artifacts/
+      # FIXME: Re-enable
+      if: matrix.os != 'macos-latest'
