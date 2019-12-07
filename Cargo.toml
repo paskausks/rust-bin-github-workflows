@@ -1,0 +1,7 @@
+[package]
+name = "gh-actions-template"
+version = "0.1.0"
+authors = ["Rihards Paskausks <pundurs@glhf.lv>"]
+edition = "2018"
+
+[dependencies]
