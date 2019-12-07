@@ -26,15 +26,15 @@ jobs:
       matrix:
         build: [linux, macos, windows]
         include:
-          - build: linux
-            os: ubuntu-latest
-            rust: stable
+          # - build: linux
+          #   os: ubuntu-latest
+          #   rust: stable
           - build: macos
             os: macos-latest
             rust: stable
-          - build: windows
-            os: windows-latest
-            rust: stable
+          # - build: windows
+          #   os: windows-latest
+          #   rust: stable
 
     steps:
     - uses: actions/checkout@v1
@@ -63,10 +63,19 @@ jobs:
       run: 7z a -tzip ./artifacts/${{ env.RELEASE_BIN }}-windows-x86_64.zip ./target/release/${{ env.RELEASE_BIN }}.exe ${{ env.RELEASE_ADDS }}
       if: matrix.os == 'windows-latest'
 
-    # FIXME: Disabled for now since 7-zip is not available on MacOS.
-    # - name: Create archive for MacOS
-    #   run: 7z a -tzip ./artifacts/{{ env.RELEASE_BIN }}-mac-x86_64.zip ./target/release/{{ env.RELEASE_BIN }} {{ env.RELEASE_ADDS }}
-    #   if: matrix.os == 'macos-latest'
+    - name: Create archive for MacOS
+      # 7Zip not available on MacOS, use a ZIP action.
+      uses: montudor/action-zip@v0.1.0
+      run: mkdir artifacts
+      with:
+        args: zip ./artifacts/${{env.RELEASE_BIN}}-macOS-x86_64.zip -j ./target/release/${{ env.RELEASE_ADDS }}
+      if: matrix.os == 'macos-latest'
+
+    - name: Add additional files to MacOS archive
+      uses: montudor/action-zip@v0.1.0
+      with:
+        args: zip ./artifacts/${{env.RELEASE_BIN}}-macOS-x86_64.zip ${{ env.RELEASE_ADDS }}
+      if: matrix.os == 'macos-latest'
 
     # This will double-zip
     # See - https://github.com/actions/upload-artifact/issues/39
@@ -75,5 +84,3 @@ jobs:
       with:
         name: ${{ runner.os }}
         path: artifacts/
-      # FIXME: Re-enable
-      if: matrix.os != 'macos-latest'
